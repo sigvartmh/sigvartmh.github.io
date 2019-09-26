@@ -191,7 +191,7 @@
             .right-column[
             
             - Embedde working group in rust tries to create a general [embedded hal](https://github.com/rust-embedded/embedded-hal) crate with traits for regular interfaces
-              - Similar to zephyrs device/driver API
+              - Similar to zephyrs device/driver APIs
 
             - Support crates for cortex_m interfaces, cortex_m rt(runtime)
 
@@ -202,8 +202,36 @@
             - [nRF91 rust bootloader](https://github.com/sigvartmh/nrf91-rust-bootloader)
 
             ]
-            
             ---
+            .left-column[
+              ## What is  <span style="color: brown">rust</span>?
+              ## Embedded <span style="color: brown">rust</span>?
+              ## The <span style="color: hotpink">ugly</span>
+            ]
+            .right-column[
+            
+            - Uses an extern c function as entrypoint
+            ```
+            // The reset vector, a pointer into the reset handler
+            #[link_section = ".vector_table.reset_vector"]
+            #[no_mangle]
+            pub static RESET_VECTOR: unsafe extern "C" fn() -> ! = Reset;
+            ```
+            - Create a rust functioon entry pointers
+            ```
+            pub unsafe extern "C" fn Reset() -> ! {
+              extern "Rust" {
+                  fn main() -> !;
+              }
+          
+              main()
+            }
+            ```
+
+            ]
+            ---
+
+           
                 
 
     </textarea>
@@ -212,7 +240,7 @@
     <script>
        var slideshow = remark.create({
           highlightStyle: 'monokai',
-          highlightLanguage: 'C',
+          highlightLanguage: 'rust',
           ratio: '16:9',
           highlightLines: true
         }) ;
