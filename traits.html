@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Title</title>
+    <title>Rust Traits</title>
     <meta charset="utf-8">
     <style>
       @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
@@ -128,104 +128,166 @@
     
       
     <textarea id="source">
-        
-            name: inverse
-            layout: true
-            class: center, middle, inverse
-            ---
-            #Traits in <span style="color: brown">rust</span>
-            ---
-            layout: false
-            .left-column[
-              ## What is <span style="color: brown">traits</span>?
-            ]
-            .right-column[
-              Rust traits are some what similar to C++ interface and even closer to <span style="color: #55c">C++20</span> concepts
-              - Similar to attributes
-              - Basis for polymorphism in <span style="color: brown">rust</span>
-              - Traits can inheirt from other traits
 
-            ]
-            ---
-            Example
-            ```
-            fn largest<T: PartialOrd + Copy>(list: &Vec<T>) -> T {
-                let mut largest = list[0];
+	    name: inverse
+	    layout: true
+	    class: center, middle, inverse
+	    ---
+	    # Traits in <span style="color: brown">rust</span>
+	    ---
+	    layout: false
+	    .left-column[
+	    ## What is <span style="color: brown">traits</span>?
+	    ]
+	    .right-column[
+	    Rust traits are some what similar to C++ interface and even closer to <span style="color: #55c">C++20</span> concepts
+	    - Similar to attributes
+	    - Basis for polymorphism in <span style="color: brown">rust</span>
+	    - Traits can inheirt from other traits
 
-                for &item in list.iter() {
-                    if item > largest {
-                        largest = item
-                    }
-                }
+	    ]
+	    ---
+	    Traits can not implement other traits
+	    trait Foo {}
+	    trait Bar {
+	      fn fooify(&self) -> impl Foo;
+	    }
+	    ```
+	    ---
+	    layout: false
+	    .left-column[
+	    ## What can't you do with <span style="color: brown">traits</span>?
+	    ]
+	    .right-column[
+	    Looks very object-oriented but it is not.
+	    We don't have:
+	    - run-time polymorphism
+	    - messages
+	    - classes
+	    - subtypes
+	    - method overloading
 
-                largest
-            }
-            ```
-            Compiler can ensure that every type which is passed to the function implements the greater than trait.
-            ---
-            A trait can be defined in <span style="color: brown">rust</span> like this
-            ```
-            pub trait Shape {
-                fn area(&self) -> f32;
-                fn as_string(&self) -> String;
-            }
-            ```
-            Here we implement shape for a structure
-            ```
-            use shape::Shape;
-            struct Rectangle {
-                height: f32,
-                width: f32
-            }
+	    ]
+	    ---
+	    ```
+	    fn main() {
+	      let v = vec![1,2,3];
+	      let i = make_iter(&v);
+	    }
+	    
+	    fn make_iter<'a>(v: &'a Vec<u8>) -> impl Iterator<Item=&u8> {
+	      v.iter();
+	    }
+	    ```
+	    
+	    ---
+	    layout: false
+	    .left-column[
+	    ## So what is the difference between tratis and concepts <span style="color: brown">traits</span>?
+	    ]
+	    .right-column[
 
-            impl Shape for Rectangle {
-                fn area(&self) -> f32 {
-                    self.width * self.height
-                }
-                fn as_string(&self) -> String {
-                    format!("Rectangle: width={}, height={}", self.width, self.height)
-                }
-            }
-            ```
-            Looks very much like virtual functions in an OO design in C++ this could be implemented for different structures which needs can populate the same traits.
-            ---
-            Now we can create an Vector of the shapes
-            ```
-            let mut shapes = Vec<&dyn Shape> = vec![];
-            let rec = Rectangle { width: 20f32, height: 6f32 }
-            let cir = Circle {radius: 5f32}
-            shapes.push(&rec);
-            shapes.push(&cir);
+	    ]
+	    ---
+	    Let us look at implementations first
+	    ```
+	    #[derive(Debug)]
+	    struct DFU_target {
+	      imgtype: i32,
+	      offset: i32
+	    }
 
-            for &s in shapes.iter() {
-                println!("area: {}, string: {}", s.area(), s.as_string());
-            }
-            ```
-            ```
-            area: 120 string: Rectangle: width=20 height=6
-            area: 78.5 string: Circle: radius=5
-            ```
-            This example does ofcourse use a heap since we create a dynamic vector with the `&dyn` keyword which means we can grow our vector with each push.
-            ```
-            let shapes : [Shape; 2] = [&rec, &cir];
-            
-            for &s in shapes.iter() {
-                println!("area: {}, string: {}", s.area(), s.as_string());
-            }
-            ```
-            This is how you would create an arary  which does the same 
-            ---
+	    impl DFU_target {
+	      fn new(imgtype: i32, offset: i32) -> DFU_target {
+	        DFU_target {imgtype: imgtype, offset: offset}
+	      }
+	    }
 
+	    fn main() {
+	      let target = DFU_target::new(1,0x200);
+	      println!("{:?}", target);
+	    }
+	    ```
+	    ---
+	    Example
+	    ```
+	    fn largest<T: PartialOrd + Copy>(list: &Vec<T>) -> T {
+	    let mut largest = list[0];
 
-   
-           
-                
+	    for &item in list.iter() {
+	    if item > largest {
+	    largest = item
+	    }
+	    }
+
+	    largest
+	    }
+	    ```
+	    Compiler can ensure that every type which is passed to the function implements the greater than trait.
+	    ---
+	    A trait can be defined in <span style="color: brown">rust</span> like this
+	    ```
+	    pub trait Shape {
+	    fn area(&self) -> f32;
+	    fn as_string(&self) -> String;
+	    }
+	    ```
+	    Here we implement shape for a structure
+	    ```
+	    use shape::Shape;
+	    struct Rectangle {
+	    height: f32,
+	    width: f32
+	    }
+
+	    impl Shape for Rectangle {
+	    fn area(&self) -> f32 {
+	    self.width * self.height
+	    }
+	    fn as_string(&self) -> String {
+	    format!("Rectangle: width={}, height={}", self.width, self.height)
+	    }
+	    }
+	    ```
+	    Looks very much like virtual functions in an OO design in C++ this could be implemented for different structures which needs can populate the same traits.
+	    ---
+	    Now we can create an Vector of the shapes
+	    ```
+	    let mut shapes = Vec<&dyn Shape> = vec![];
+	    let rec = Rectangle { width: 20f32, height: 6f32 }
+	    let cir = Circle {radius: 5f32}
+	    shapes.push(&rec);
+	    shapes.push(&cir);
+
+	    for &s in shapes.iter() {
+	    println!("area: {}, string: {}", s.area(), s.as_string());
+	    }
+	    ```
+	    ```
+	    area: 120 string: Rectangle: width=20 height=6
+	    area: 78.5 string: Circle: radius=5
+	    ```
+	    This example does ofcourse use a heap since we create a dynamic vector with the `&dyn` keyword which means we can grow our vector with each push.
+	    ```
+	    let shapes : [Shape; 2] = [&rec, &cir];
+
+	    for &s in shapes.iter() {
+	    println!("area: {}, string: {}", s.area(), s.as_string());
+	    }
+	    ```
+	    This is how you would create an arary  which does the same 
+	    ---
+	    ```
+	    println!("Hello, world!");
+	    ```
+	    This is how you would create an arary  which does the same 
+	    ---
 
     </textarea>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.js">
+    <script src="dist/remark.js">
     </script>
     <script>
-       var slideshow = remark.create({
+       const slideshow = remark.create({
           highlightStyle: 'monokai',
           highlightLanguage: 'rust',
           ratio: '16:9',
@@ -233,7 +295,46 @@
         }) ;
     </script>
     <script>
-        var hljs = remark.highlighter.engine;
+	    extend_code = (code) => {
+		if (!code.match(/^fn \w+/m)) {
+			code = "fn main() {\n" + code + "\n}"
+		} else if (!code.match(/^fn main/m)) { // some functions, no main, add an empty one
+			code = code + "\n\nfn main() {}";
+		}
+		return code;
+	}
+        const hljs = remark.highlighter.engine;
+	const code_blocks = document.querySelectorAll("pre code");
+	code_blocks.forEach((block) => {
+		block.setAttribute("contenteditable", true);
+		let run_button = document.createElement('button');
+		let output = document.createElement('code');
+		output.className = "compiled hljs remark-code";
+		output.style.visibility = 'hidden';
+		output.style.margin = '5px 0px 0px 0px'; 
+		run_button.innerText = 'run';
+		run_button.onclick = (click) => {
+			let sibling = click.target.nextSibling 
+			const compiled = sibling.nextSibling;
+			compiled.style.visibility = 'hidden';
+			let code = extend_code(click.target.nextSibling.textContent);
+			let payload = {optimize:"0", version:"stable", code: code};
+			let baseUrl = "https://play.rust-lang.org/evaluate.json";
+			fetch(baseUrl, {
+				method: 'POST',
+				dataType: "json",
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify(payload),
+			}).then(res => res.json())
+			  .then(data => { compiled.textContent=data.result;
+					  compiled.style.visibility = '';
+			  });
+		};
+		block.before(run_button);
+		block.after(output);
+	});
       </script>
   </body>
 </html>
