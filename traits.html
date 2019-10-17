@@ -135,6 +135,7 @@
 	    ---
 	    # Traits in <span style="color: brown">rust</span>
 	    ---
+	    name: agenda
 	    layout: false
 	    .left-column[
 	    ## What is <span style="color: brown">traits</span>?
@@ -147,14 +148,7 @@
 
 	    ]
 	    ---
-	    Traits can not implement other traits
-	    ```
-	    trait Foo {}
-	    trait Bar {
-	      fn fooify(&self) -> impl Foo;
-	    }
-	    ```
-	    ---
+	    template: agenda
 	    layout: false
 	    .left-column[
 	    ## What can't you do with <span style="color: brown">traits</span>?
@@ -162,13 +156,169 @@
 	    .right-column[
 	    Looks very object-oriented but it is not.
 	    We don't have:
-	    - run-time polymorphism
 	    - messages
 	    - classes
-	    - subtypes
-	    - method overloading
-
+	    - method overloading (can be implemented with traits)
+	    - Traits can not implement other traits
+	    ```
+	    trait Foo {}
+	    trait Bar {
+	      fn fooify(&self) -> impl Foo;
+	    }
+	    ```
 	    ]
+	    ---
+	    # Traits
+	    ```
+	    struct Elf {
+	      name: String
+	    }
+	    
+	    struct Orc{
+	      name: String
+	    }
+	    ```
+	    Making a trait
+	    ```
+	    pub trait Agility{
+	      fn agility_bonus(&self) -> u8;
+	    }
+	    ```
+	    ---
+	    The traits needs now to be implemented on a type
+	    ```
+	    fn main(){
+	      let my_elf = Elf {name:String::from("Legolas")};
+	      println!("{:?} agility bonus:{:u8}", my_elf, my_elf.agility_bonus());
+	    }
+
+	    pub trait Agility{
+	      fn agility_bonus(&self) -> u8;
+	    }
+
+	    #[derive(Debug)]
+	    struct Elf {
+	      name: String
+	    }
+
+	    impl Agility for Elf {
+	      fn agility_bonus(&self) -> u8 { 3 }
+	    }
+	    ```
+	    ---
+	    Would have to do the same for Orc but what if they have the same
+	    implementation.
+	    ```
+	    pub trait Agility{
+	      fn agility_bonus(&self) -> u8
+	      { 0 }
+	    }
+	    ```
+	    ---
+	
+	    needs to still be implemented for every type/struct type
+
+	    ```
+	    fn main(){
+	      let my_elf = Elf {name:String::from("Legolas")};
+	      let my_hum = Human {name:String::from("Bjarne")};
+	      println!("human:{} elf:{}", my_hum.agility_bonus(), my_elf.agility_bonus());
+	    }
+
+	    pub trait Agility{
+	      fn agility_bounds(&self) -> u8
+	      { 0 }
+	    }
+	    struct Human{
+	      name: String
+	    }
+	    struct Elf {
+	      name: String
+	    }
+	    struct Orc{
+	      name: String
+	    }
+	    impl Agility for Human { }
+	    impl Agility for Orc{ }
+	    impl Agility for Elf {
+	      fn agility_bonus(&self) -> u8 { 3 }
+	    }
+
+	    ```
+	    ---
+	    ```
+	    fn main(){
+	      let elf = Elf{name:String::from("Legolas")};
+	      let dwarf = Dwarf{name:String::from("Bjarne")};
+	      println!("agile: {}", agile(elf));
+	    }
+	    
+	    pub fn agile<T: Agility>(character: T) -> String{ String::from("yes")}
+
+	    pub trait Agility{
+	      fn agility_bonus(&self) -> u8
+	      { 0 }
+	    }
+	    impl Agility for Elf {
+	      fn agility_bonus(&self) -> u8 { 3 }
+	    }
+	    struct Elf {
+	      name: String
+	    }
+	    struct Dwarf{
+	      name: String
+	    }
+
+	    ```
+
+	    ---
+	    # Trait Bounds
+	    ```
+	    pub trait {}
+	    pub fn agile<T: Orcish>(character: T) -> String
+	    {
+	      String::from("yes")
+	    }
+	    ```
+	    ---
+	    # Trait Object
+	    Object typically holds
+	    - Holds data and behaviour
+	    Structs
+	    - Holds data
+	    In rust our Trait object
+	    - Holds data on the heap (can't add data to trait object)
+	    - Behavior 
+	    ---
+	    ```
+	    struct Fire {}
+	    struct Water {}
+	    pub trait Interaction {
+	      fn interact(&self);
+	    }
+	    
+	    impl Interaction for Fire {
+	      fn interact(&self) {
+	        //detailed implementation
+	      }
+	    }
+	    ``` 
+	    ---
+	    ```
+	    struct Elements {
+	      pub elements: Vec<Box<Interaction>>,
+	    }
+
+	    impl Elements {
+	      pub fn test(&self){
+	        for element in self.elements.iter() {
+		  self.interact();
+		}
+	      }
+	    }
+	    ```
+	    ---
+	    What is a box a box is a pointer to a value on the heap.
 	    ---
 	    ```
 	    fn main() {
@@ -192,22 +342,23 @@
 	    ---
 	    Let us look at implementations first
 	    ```
-	    #[derive(Debug)]
-	    struct DFU_target {
-	      imgtype: i32,
-	      offset: i32
+	    fn main() {
+	      let target = Dfutarget::new(2,0x200);
+	      println!("{:?}", target);
 	    }
 
-	    impl DFU_target {
-	      fn new(imgtype: i32, offset: i32) -> DFU_target {
-	        DFU_target {imgtype: imgtype, offset: offset}
+	    #[derive(Debug)]
+	    struct Dfutarget {
+	      pub img_type : u32,
+	      offset : i32
+	    }
+
+	    impl Dfutarget{
+	      fn new(img_type: u32, offset: i32) -> Dfutarget {
+	        Dfutarget { img_type : img_type, offset : offset }
 	      }
 	    }
 
-	    fn main() {
-	      let target = DFU_target::new(1,0x200);
-	      println!("{:?}", target);
-	    }
 	    ```
 	    ---
 	    Example
