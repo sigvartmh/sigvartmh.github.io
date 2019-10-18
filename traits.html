@@ -122,371 +122,510 @@
     
     </style>
     
-  </head>
-  <body>
+</head>
+<body>
+<textarea id="source">
+name: inverse
+layout: true
+class: center, middle, inverse
+---
+# Traits in <span style="color: brown">rust</span>
+---
+layout: false
+## Some basics
+.left-column[
+## Structs
+]
+.right-column[
+Defining a structure
+```
+struct Point2D {
+	x: f64,
+	y: f64,
+}
+```
+assigning structures
+```
+let point = Point2D { x: 2.0, y: 3.0};
+```
+]
+---
+layout: false
+## Some basics
+.left-column[
+## Structs
+## Implementations
+]
+.right-column[
+- Implicit return
+- Implement function for a type/structures
 
-    
-      
-    <textarea id="source">
 
-	    name: inverse
-	    layout: true
-	    class: center, middle, inverse
-	    ---
-	    # Traits in <span style="color: brown">rust</span>
-	    ---
-	    name: agenda
-	    layout: false
-	    .left-column[
-	    ## What is <span style="color: brown">traits</span>?
-	    ]
-	    .right-column[
-	    Rust traits are some what similar to C++ interface and even closer to <span style="color: #55c">C++20</span> concepts
-	    - Similar to attributes
-	    - Basis for polymorphism in <span style="color: brown">rust</span>
-	    - Traits can inheirt from other traits
+```
+impl Point2D {
+	fn move(self, x: f64, y: f64) -> Point2D{
+		Point2D {
+			x: self.x + x,
+			y: self.y + y,
 
-	    ]
-	    ---
-	    template: agenda
-	    layout: false
-	    .left-column[
-	    ## What can't you do with <span style="color: brown">traits</span>?
-	    ]
-	    .right-column[
-	    Looks very object-oriented but it is not.
-	    We don't have:
-	    - messages
-	    - classes
-	    - method overloading (can be implemented with traits)
-	    - Traits can not implement other traits
-	    ```
-	    trait Foo {}
-	    trait Bar {
-	      fn fooify(&self) -> impl Foo;
-	    }
-	    ```
-	    ]
-	    ---
-	    # Traits
-	    ```
-	    struct Elf {
-	      name: String
-	    }
-	    
-	    struct Orc{
-	      name: String
-	    }
-	    ```
-	    Making a trait
-	    ```
-	    pub trait Agility{
-	      fn agility_bonus(&self) -> u8;
-	    }
-	    ```
-	    ---
-	    The traits needs now to be implemented on a type
-	    ```
-	    fn main(){
-	      let my_elf = Elf {name:String::from("Legolas")};
-	      println!("{:?} agility bonus:{:u8}", my_elf, my_elf.agility_bonus());
-	    }
-
-	    pub trait Agility{
-	      fn agility_bonus(&self) -> u8;
-	    }
-
-	    #[derive(Debug)]
-	    struct Elf {
-	      name: String
-	    }
-
-	    impl Agility for Elf {
-	      fn agility_bonus(&self) -> u8 { 3 }
-	    }
-	    ```
-	    ---
-	    Would have to do the same for Orc but what if they have the same
-	    implementation.
-	    ```
-	    pub trait Agility{
-	      fn agility_bonus(&self) -> u8
-	      { 0 }
-	    }
-	    ```
-	    ---
-	
-	    needs to still be implemented for every type/struct type
-
-	    ```
-	    fn main(){
-	      let my_elf = Elf {name:String::from("Legolas")};
-	      let my_hum = Human {name:String::from("Bjarne")};
-	      println!("human:{} elf:{}", my_hum.agility_bonus(), my_elf.agility_bonus());
-	    }
-
-	    pub trait Agility{
-	      fn agility_bounds(&self) -> u8
-	      { 0 }
-	    }
-	    struct Human{
-	      name: String
-	    }
-	    struct Elf {
-	      name: String
-	    }
-	    struct Orc{
-	      name: String
-	    }
-	    impl Agility for Human { }
-	    impl Agility for Orc{ }
-	    impl Agility for Elf {
-	      fn agility_bonus(&self) -> u8 { 3 }
-	    }
-
-	    ```
-	    ---
-	    ```
-	    fn main(){
-	      let elf = Elf{name:String::from("Legolas")};
-	      let dwarf = Dwarf{name:String::from("Bjarne")};
-	      println!("agile: {}", agile(elf));
-	    }
-	    
-	    pub fn agile<T: Agility>(character: T) -> String{ String::from("yes")}
-
-	    pub trait Agility{
-	      fn agility_bonus(&self) -> u8
-	      { 0 }
-	    }
-	    impl Agility for Elf {
-	      fn agility_bonus(&self) -> u8 { 3 }
-	    }
-	    struct Elf {
-	      name: String
-	    }
-	    struct Dwarf{
-	      name: String
-	    }
-
-	    ```
-
-	    ---
-	    # Trait Bounds
-	    ```
-	    pub trait {}
-	    pub fn agile<T: Orcish>(character: T) -> String
-	    {
-	      String::from("yes")
-	    }
-	    ```
-	    ---
-	    # Trait Object
-	    Object typically holds
-	    - Holds data and behaviour
-	    Structs
-	    - Holds data
-	    In rust our Trait object
-	    - Holds data on the heap (can't add data to trait object)
-	    - Behavior 
-	    ---
-	    ```
-	    struct Fire {}
-	    struct Water {}
-	    pub trait Interaction {
-	      fn interact(&self);
-	    }
-	    
-	    impl Interaction for Fire {
-	      fn interact(&self) {
-	        //detailed implementation
-	      }
-	    }
-	    ``` 
-	    ---
-	    ```
-	    struct Elements {
-	      pub elements: Vec<Box<Interaction>>,
-	    }
-
-	    impl Elements {
-	      pub fn test(&self){
-	        for element in self.elements.iter() {
-		  self.interact();
 		}
-	      }
-	    }
-	    ```
-	    ---
-	    What is a box a box is a pointer to a value on the heap.
-	    ---
-	    ```
-	    fn main() {
-	      let v = vec![1,2,3];
-	      let i = make_iter(&v);
-	    }
-	    
-	    fn make_iter<'a>(v: &'a Vec<u8>) -> impl Iterator<Item=&u8> {
-	      v.iter();
-	    }
-	    ```
-	    
-	    ---
-	    layout: false
-	    .left-column[
-	    ## So what is the difference between tratis and concepts <span style="color: brown">traits</span>?
-	    ]
-	    .right-column[
-
-	    ]
-	    ---
-	    Let us look at implementations first
-	    ```
-	    fn main() {
-	      let target = Dfutarget::new(2,0x200);
-	      println!("{:?}", target);
-	    }
-
-	    #[derive(Debug)]
-	    struct Dfutarget {
-	      pub img_type : u32,
-	      offset : i32
-	    }
-
-	    impl Dfutarget{
-	      fn new(img_type: u32, offset: i32) -> Dfutarget {
-	        Dfutarget { img_type : img_type, offset : offset }
-	      }
-	    }
-
-	    ```
-	    ---
-	    Example
-	    ```
-	    fn largest<T: PartialOrd + Copy>(list: &Vec<T>) -> T {
-	    let mut largest = list[0];
-
-	    for &item in list.iter() {
-	    if item > largest {
-	    largest = item
-	    }
-	    }
-
-	    largest
-	    }
-	    ```
-	    Compiler can ensure that every type which is passed to the function implements the greater than trait.
-	    ---
-	    A trait can be defined in <span style="color: brown">rust</span> like this
-	    ```
-	    pub trait Shape {
-	    fn area(&self) -> f32;
-	    fn as_string(&self) -> String;
-	    }
-	    ```
-	    Here we implement shape for a structure
-	    ```
-	    use shape::Shape;
-	    struct Rectangle {
-	    height: f32,
-	    width: f32
-	    }
-
-	    impl Shape for Rectangle {
-	    fn area(&self) -> f32 {
-	    self.width * self.height
-	    }
-	    fn as_string(&self) -> String {
-	    format!("Rectangle: width={}, height={}", self.width, self.height)
-	    }
-	    }
-	    ```
-	    Looks very much like virtual functions in an OO design in C++ this could be implemented for different structures which needs can populate the same traits.
-	    ---
-	    Now we can create an Vector of the shapes
-	    ```
-	    let mut shapes = Vec<&dyn Shape> = vec![];
-	    let rec = Rectangle { width: 20f32, height: 6f32 }
-	    let cir = Circle {radius: 5f32}
-	    shapes.push(&rec);
-	    shapes.push(&cir);
-
-	    for &s in shapes.iter() {
-	    println!("area: {}, string: {}", s.area(), s.as_string());
-	    }
-	    ```
-	    ```
-	    area: 120 string: Rectangle: width=20 height=6
-	    area: 78.5 string: Circle: radius=5
-	    ```
-	    This example does ofcourse use a heap since we create a dynamic vector with the `&dyn` keyword which means we can grow our vector with each push.
-	    ```
-	    let shapes : [Shape; 2] = [&rec, &cir];
-
-	    for &s in shapes.iter() {
-	    println!("area: {}, string: {}", s.area(), s.as_string());
-	    }
-	    ```
-	    This is how you would create an arary  which does the same 
-	    ---
-	    ```
-	    println!("Hello, world!");
-	    ```
-	    This is how you would create an arary  which does the same 
-	    ---
-
-    </textarea>
-    <script src="dist/remark.js">
-    </script>
-    <script>
-       const slideshow = remark.create({
-          highlightStyle: 'monokai',
-          highlightLanguage: 'rust',
-          ratio: '16:9',
-          highlightLines: true
-        }) ;
-    </script>
-    <script>
-	    extend_code = (code) => {
-		if (!code.match(/^fn \w+/m)) {
-			code = "fn main() {\n" + code + "\n}"
-		} else if (!code.match(/^fn main/m)) { // some functions, no main, add an empty one
-			code = code + "\n\nfn main() {}";
-		}
-		return code;
 	}
-        const hljs = remark.highlighter.engine;
-	const code_blocks = document.querySelectorAll("pre code");
-	code_blocks.forEach((block) => {
-		block.setAttribute("contenteditable", true);
-		let run_button = document.createElement('button');
-		let output = document.createElement('code');
-		output.className = "compiled hljs remark-code";
-		output.style.visibility = 'hidden';
-		output.style.margin = '5px 0px 0px 0px'; 
-		run_button.innerText = 'run';
-		run_button.onclick = (click) => {
-			let sibling = click.target.nextSibling 
-			const compiled = sibling.nextSibling;
-			compiled.style.visibility = 'hidden';
-			let code = extend_code(click.target.nextSibling.textContent);
-			let payload = {optimize:"0", version:"stable", code: code};
-			let baseUrl = "https://play.rust-lang.org/evaluate.json";
-			fetch(baseUrl, {
-				method: 'POST',
-				dataType: "json",
-				headers: {
-					'content-type': 'application/json'
-				},
-				body: JSON.stringify(payload),
-			}).then(res => res.json())
-			  .then(data => { compiled.textContent=data.result;
-					  compiled.style.visibility = '';
-			  });
-		};
-		block.before(run_button);
-		block.after(output);
-	});
-      </script>
-  </body>
+	//more methods
+}
+```
+]
+---
+layout: false
+# Example
+```
+#[derive(Debug)]
+struct Point2D { x: f64, y: f64}
+
+impl Point2D {
+    fn move_point(self, x: f64, y: f64) -> Point2D{
+        Point2D { x: self.x + x, y: self.y + y,
+        }
+    }
+}
+
+let point = Point2D { x: 2.0, y: 3.0};
+println!("{:?}", point);
+let point2 = point.move_point(3.0,4.0);
+println!("{:?}", point2);
+
+```
+
+---
+name: agenda
+layout: false
+.left-column[
+## What is <span style="color: brown">traits</span>?
+]
+.right-column[
+Rust traits are some what similar to C++ interface and even closer to <span style="color: #55c">C++20</span> concepts
+- Similar to attributes
+- Basis for polymorphism in <span style="color: brown">rust</span>
+- Traits can inheirt from other traits
+
+]
+---
+layout: false
+.left-column[
+## What is <span style="color: brown">traits</span>?
+## What can't you do with <span style="color: brown">traits</span>?
+]
+.right-column[
+Looks very object-oriented but it is not.
+We don't have:
+- messages
+- classes
+- method overloading (can be implemented with traits)
+- Run time polymorphism*
+
+
+Traits cannot implement other traits
+```
+trait Foo {}
+trait Bar { fn fooify(&self) -> impl Foo;}
+```
+]
+---
+layout: false
+.left-column[
+## Creating traits
+]
+.right-column[
+
+```
+struct Elf {
+  name: String
+}
+
+struct Orc{
+  name: String
+}
+```
+Making a trait
+```
+pub trait Agility{
+  fn agility_bonus(&self) -> u8;
+  fn agility_multiplier(&self) -> u8;
+}
+```
+- define a series of methods but you don't define the implementation.
+]
+---
+layout: false
+
+.left-column[
+### The traits needs now to be implemented on a type
+]
+.right-column[
+```
+fn main(){
+  let my_elf = Elf {name:String::from("Legolas")};
+  println!("{:?} agility bonus:{}", my_elf, my_elf.agility_bonus());
+}
+
+pub trait Agility{
+  fn agility_bonus(&self) -> u8;
+}
+
+#[derive(Debug)]
+struct Elf {
+  name: String
+}
+
+impl Agility for Elf {
+  fn agility_bonus(&self) -> u8 { 3 }
+}
+```
+]
+---
+Would have to do the same for Orc but what if they have the same
+implementation.
+```
+pub trait Agility{
+  fn agility_bonus(&self) -> u8
+  { 0 }
+}
+```
+---
+
+needs to still be implemented for every type/struct type
+
+```
+fn main(){
+  let my_elf = Elf {name:String::from("Legolas")};
+  let my_hum = Human {name:String::from("Bjarne")};
+  println!("human:{} elf:{}", my_hum.agility_bonus(), my_elf.agility_bonus());
+}
+
+pub trait Agility{
+  fn agility_bounds(&self) -> u8
+  { 0 }
+}
+struct Human{
+  name: String
+}
+struct Elf {
+  name: String
+}
+struct Orc{
+  name: String
+}
+impl Agility for Human { }
+impl Agility for Orc{ }
+impl Agility for Elf {
+  fn agility_bonus(&self) -> u8 { 3 }
+}
+
+```
+---
+```
+fn main(){
+  let elf = Elf{name:String::from("Legolas")};
+  let dwarf = Dwarf{name:String::from("Bjarne")};
+  println!("agile: {}", agile(elf));
+}
+
+pub fn agile<T: Agility>(character: T) -> String{ String::from("yes")}
+
+pub trait Agility{
+  fn agility_bonus(&self) -> u8
+  { 0 }
+}
+impl Agility for Elf {
+  fn agility_bonus(&self) -> u8 { 3 }
+}
+struct Elf {
+  name: String
+}
+struct Dwarf{
+  name: String
+}
+
+```
+---
+class: center, middle, inverse
+# The forbidden relm
+---
+layout: false
+# Trait Object
+Object typically holds
+- Holds data and behaviour
+Structs
+- Holds data
+Traits
+- Holds behaviour
+In rust our Trait object
+- Holds data on the heap (can't add data to trait object)
+- Behavior in the trait
+- Trait objects are a pair of pointers to a virtual function table and the data.
+---
+```
+struct Fire {}
+struct Water {}
+pub trait Interaction {
+  fn interact(&self);
+}
+
+impl Interaction for Fire {
+  fn interact(&self) {
+    //detailed implementation
+  }
+}
+```
+---
+```
+struct Elements {
+  pub elements: Vec<Box<Interaction>>,
+}
+
+impl Elements {
+  pub fn test(&self){
+    for element in self.elements.iter() {
+      self.interact();
+    }
+  }
+}
+```
+---
+## What is a box a box is a pointer to a value on the heap.
+---
+## A little bit about generics
+```
+pub fn log_example<L>(logger: &L) where L : Logger {}
+```
+- L is the type parameter
+
+---
+## Generics vs trait objects
+### Generic type parameters
+- Compiler creates a new copy of the function for each type
+- Better optimization
+    - function can be optimized differently depending on the type
+    - function calls can be inlined
+- Generates more code
+    - larger executables
+    - longer compile-times
+
+## Trait objects
+- Compiler creates only one copy of the function
+- Prevents type specific optimizations
+- Add overhead
+- Uses heap
+- Generates less code
+    - Smaller executables, faster compilation
+---
+layout: false
+.left-column[
+## Difference between <span style="color: brown">traits</span> and concepts ?
+]
+.right-column[
+## Similarities:
+- Define a liste of requirements
+- bound/restrict generic/template types
+- monomorphized(if not using trait objects)
+
+## Difference:
+- Mentioned above run-time vs compile time polymorphism
+- Structural vs nominal typing
+    - C++ type may "accidentialy" satisfy the requirements of a concept
+    - Rust this is not possible you have to define `impl Trait for Type`
+]
+---
+layout: false
+.left-column[
+## Difference between <span style="color: brown">traits</span> and concepts ?
+]
+.right-column[
+
+## Difference:
+### Constraints
+- Traits
+    - No method can be called on a variable fo a generic type without the type being required to implement a trait providing the method.
+- Concepts
+    - Method can be called on variable generic type
+    - Method can be called on a varaible generic type withough the method being specified by any Concept or Constraint
+    - Constraints can be ad-hoc does not require a concept
+
+### Requirements
+- Concets/constraints allow the use of almost the whole language like nested types/constants/methods/fields
+- Traits only allow a small subset of requirements assosicated to types/constants and methods
+
+You are not allowed to overload functions/traits of standard types and functions
+
+]
+---
+Overload Selection
+Rust has no concept of ad-hoc overloading, overloading only occurs by Traits and specialization is not possible yet.
+
+C++ Constraints can be used to "order" overloads from least specific to most specific, so the compiler can automatically select the most specific overload for which requirements are satisfied.
+
+Note: prior to this, either SFINAE or tag-dispatching would be used in C++ to achieve the selection; calisthenics were required to work with open-ended overload sets.
+---
+```
+fn main() {
+  let v = vec![1,2,3];
+  let i = make_iter(&v);
+}
+
+fn make_iter<'a>(v: &'a Vec<u8>) -> impl Iterator<Item=&u8> {
+  v.iter();
+}
+```
+---
+class: center middle inverse
+# Enums
+---
+
+---
+Let us look at implementations first
+```
+fn main() {
+  let target = Dfutarget::new(2,0x200);
+  println!("{:?}", target);
+}
+
+#[derive(Debug)]
+struct Dfutarget {
+  pub img_type : u32,
+  offset : i32
+}
+
+impl Dfutarget{
+  fn new(img_type: u32, offset: i32) -> Dfutarget {
+    Dfutarget { img_type : img_type, offset : offset }
+  }
+}
+
+```
+---
+Example
+```
+fn largest<T: PartialOrd + Copy>(list: &Vec<T>) -> T {
+let mut largest = list[0];
+
+for &item in list.iter() {
+if item > largest {
+largest = item
+}
+}
+
+largest
+}
+```
+Compiler can ensure that every type which is passed to the function implements the greater than trait.
+---
+A trait can be defined in <span style="color: brown">rust</span> like this
+```
+pub trait Shape {
+fn area(&self) -> f32;
+fn as_string(&self) -> String;
+}
+```
+Here we implement shape for a structure
+```
+use shape::Shape;
+struct Rectangle {
+height: f32,
+width: f32
+}
+
+impl Shape for Rectangle {
+fn area(&self) -> f32 {
+self.width * self.height
+}
+fn as_string(&self) -> String {
+format!("Rectangle: width={}, height={}", self.width, self.height)
+}
+}
+```
+Looks very much like virtual functions in an OO design in C++ this could be implemented for different structures which needs can populate the same traits.
+---
+Now we can create an Vector of the shapes
+```
+let mut shapes = Vec<&dyn Shape> = vec![];
+let rec = Rectangle { width: 20f32, height: 6f32 }
+let cir = Circle {radius: 5f32}
+shapes.push(&rec);
+shapes.push(&cir);
+
+for &s in shapes.iter() {
+println!("area: {}, string: {}", s.area(), s.as_string());
+}
+```
+```
+area: 120 string: Rectangle: width=20 height=6
+area: 78.5 string: Circle: radius=5
+```
+This example does ofcourse use a heap since we create a dynamic vector with the `&dyn` keyword which means we can grow our vector with each push.
+```
+let shapes : [Shape; 2] = [&rec, &cir];
+
+for &s in shapes.iter() {
+println!("area: {}, string: {}", s.area(), s.as_string());
+}
+```
+This is how you would create an arary  which does the same 
+---
+```
+println!("Hello, world!");
+```
+This is how you would create an arary  which does the same 
+---
+</textarea>
+<script src="dist/remark.js"></script>
+<script>
+const slideshow = remark.create({
+   highlightStyle: 'monokai',
+   highlightLanguage: 'rust',
+   ratio: '16:9',
+   highlightLines: true
+ }) ;
+</script>
+<script>
+extend_code = (code) => {
+	if (!code.match(/^fn \w+/m)) {
+		code = "fn main() {\n" + code + "\n}"
+	} else if (!code.match(/^fn main/m)) { // some functions, no main, add an empty one
+		code = code + "\n\nfn main() {}";
+	}
+	return code;
+}
+const hljs = remark.highlighter.engine;
+const code_blocks = document.querySelectorAll("pre code");
+code_blocks.forEach((block) => {
+	block.setAttribute("contenteditable", true);
+	let run_button = document.createElement('button');
+	let output = document.createElement('code');
+	output.className = "compiled hljs remark-code";
+	output.style.visibility = 'hidden';
+	output.style.margin = '5px 0px 0px 0px'; 
+	run_button.innerText = 'run';
+	run_button.onclick = (click) => {
+		let sibling = click.target.nextSibling 
+		const compiled = sibling.nextSibling;
+		compiled.style.visibility = 'hidden';
+		let code = extend_code(click.target.nextSibling.textContent);
+		let payload = {optimize:"0", version:"stable", code: code};
+		let baseUrl = "https://play.rust-lang.org/evaluate.json";
+		fetch(baseUrl, {
+			method: 'POST',
+			dataType: "json",
+			headers: {
+				'content-type': 'application/json'
+			},
+			body: JSON.stringify(payload),
+		}).then(res => res.json())
+		  .then(data => { compiled.textContent=data.result;
+				  compiled.style.visibility = '';
+		  });
+	};
+	block.before(run_button);
+	block.after(output);
+});
+</script>
+</body>
 </html>
