@@ -464,6 +464,107 @@ Rust has no concept of ad-hoc overloading, overloading only occurs by Traits and
 C++ Constraints can be used to "order" overloads from least specific to most specific, so the compiler can automatically select the most specific overload for which requirements are satisfied.
 
 Note: prior to this, either SFINAE or tag-dispatching would be used in C++ to achieve the selection; calisthenics were required to work with open-ended overload sets.
+
+---
+layout: false
+.left-column[
+## Enums in <span style="color: brown">rust</span>
+]
+.right-column[
+- A more powerful construct than you will find in C++(I think)
+- They are what is called algebraic data types
+- They can have types or even contain other enums
+
+```
+```
+
+```
+struct Ipv4Addr {
+    // --snip--
+}
+
+struct Ipv6Addr {
+    // --snip--
+}
+
+enum IpAddr {
+    V4(Ipv4Addr),
+    V6(Ipv6Addr),
+}
+impl to_string Ipv4Addr
+impl to_string Ipv6Addr
+```
+
+]
+---
+.left-column[
+## Enums in <span style="color: brown">rust</span>
+]
+.right-column[
+
+```
+fn main() {
+    let pressed = WebEvent::KeyPress('x');
+    // `to_owned()` creates an owned `String` from a string slice.
+    let pasted  = WebEvent::Paste("my text".to_owned());
+    let click   = WebEvent::Click { x: 20, y: 80 };
+    let load    = WebEvent::PageLoad;
+    let unload  = WebEvent::PageUnload;
+
+    inspect(pressed);
+    inspect(pasted);
+    inspect(click);
+    inspect(load);
+    inspect(unload);
+}
+
+enum WebEvent {
+    // An `enum` may either be `unit-like`,
+    PageLoad,
+    PageUnload,
+    // like tuple structs,
+    KeyPress(char),
+    Paste(String),
+    // or c-like structures.
+    Click { x: i64, y: i64 },
+}
+```
+]
+---
+.left-column[
+## Enums in <span style="color: brown">rust</span>
+]
+.right-column[
+
+```
+fn main() {
+    let pressed = WebEvent::KeyPress('x');
+    // `to_owned()` creates an owned `String` from a string slice.
+    let pasted  = WebEvent::Paste("my text".to_owned());
+    let click   = WebEvent::Click { x: 20, y: 80 };
+    let load    = WebEvent::PageLoad;
+    let unload  = WebEvent::PageUnload;
+
+    inspect(pressed);
+    inspect(pasted);
+    inspect(click);
+    inspect(load);
+    inspect(unload);
+}
+
+enum WebEvent {
+    // An `enum` may either be `unit-like`,
+    PageLoad,
+    PageUnload,
+    // like tuple structs,
+    KeyPress(char),
+    Paste(String),
+    // or c-like structures.
+    Click { x: i64, y: i64 },
+}
+```
+]
+---
 ---
 ```
 fn main() {
@@ -475,11 +576,6 @@ fn make_iter<'a>(v: &'a Vec<u8>) -> impl Iterator<Item=&u8> {
   v.iter();
 }
 ```
----
-class: center middle inverse
-# Enums
----
-
 ---
 Let us look at implementations first
 ```
