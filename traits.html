@@ -323,8 +323,55 @@ layout: false
 ## Trait bounds 
 ]
 .right-column[
+- For generic types `bounds` tells what a generic type T will have to have implemented
+- Bounding restrict the generic to a types that conform to the bound 
+
 ```
+// Define a function `printer` that takes a generic type `T` which
+// must implement trait `Display`.
+fn printer<T: Display>(t: T) {
+    println!("{}", t);
+}
+
+struct S<T: Display>(T);
+
+// Error! `Vec<T>` does not implement `Display`. This
+// specialization will fail.
+let s = S(vec![1]);
 ```
+]
+---
+.left-column[
+## Trait bounds 
+## Trait bounds 2
+]
+.right-column[
+- The `where` keyword allows for more expressiveness of traits bounds 
+- It can apply bounds to arbitrary types, rather than just parameters
+- Specifying types and bounds seperatly is clearer
+
+```
+impl <A: TraitB + TraitC, D: TraitE + TraitF> MyTrait<A, D> for YourType {}
+
+// Expressing bounds with a `where` clause
+impl <A, D> MyTrait<A, D> for YourType where
+    A: TraitB + TraitC,
+    D: TraitE + TraitF {}
+```
+
+- Using where clauses are more expressive than a normal syntax
+
+```
+impl<T> PrintInOption for T where
+    Option<T>: Debug {
+    // We want `Option<T>: Debug` as our bound because that is what's
+    // being printed. Doing otherwise would be using the wrong bound.
+    fn print_in_option(self) {
+        println!("{:?}", Some(self));
+    }
+}
+```
+
 ]
 ---
 ```
@@ -357,13 +404,17 @@ class: center, middle, inverse
 ---
 layout: false
 # Trait Object
-Object typically holds
+
+## Object typically holds
 - Holds data and behaviour
-Structs
+
+## Structs
 - Holds data
-Traits
+
+## Traits
 - Holds behaviour
-In rust our Trait object
+
+## In rust our Trait object
 - Holds data on the heap (can't add data to trait object)
 - Behavior in the trait
 - Trait objects are a pair of pointers to a virtual function table and the data.
@@ -377,7 +428,7 @@ pub trait Interaction {
 
 impl Interaction for Fire {
   fn interact(&self) {
-    //detailed implementation
+    /* detailed implementation */
   }
 }
 ```
@@ -463,11 +514,9 @@ You are not allowed to overload functions/traits of standard types and functions
 
 ]
 ---
-Overload Selection
+## Overload Selection
 Rust has no concept of ad-hoc overloading, overloading only occurs by Traits and specialization is not possible yet.
-
 C++ Constraints can be used to "order" overloads from least specific to most specific, so the compiler can automatically select the most specific overload for which requirements are satisfied.
-
 Note: prior to this, either SFINAE or tag-dispatching would be used in C++ to achieve the selection; calisthenics were required to work with open-ended overload sets.
 
 ---
@@ -538,38 +587,52 @@ enum WebEvent {
 ---
 .left-column[
 ## Enums in <span style="color: brown">rust</span>
+## Option type in <span style="color: brown">rust</span>
 ]
 .right-column[
-
-```
-fn main() {
-    let pressed = WebEvent::KeyPress('x');
-    // `to_owned()` creates an owned `String` from a string slice.
-    let pasted  = WebEvent::Paste("my text".to_owned());
-    let click   = WebEvent::Click { x: 20, y: 80 };
-    let load    = WebEvent::PageLoad;
-    let unload  = WebEvent::PageUnload;
-
-    inspect(pressed);
-    inspect(pasted);
-    inspect(click);
-    inspect(load);
-    inspect(unload);
-}
-
-enum WebEvent {
-    // An `enum` may either be `unit-like`,
-    PageLoad,
-    PageUnload,
-    // like tuple structs,
-    KeyPress(char),
-    Paste(String),
-    // or c-like structures.
-    Click { x: i64, y: i64 },
-}
-```
+## `Option<T>` enum has two variatns:
+- `None` indicates lack of value
+- `Some(value)` a tuple struct that wraps a value with type T
 ]
 ---
+```
+fn main() {
+    try_division(4, 2);
+    try_division(1, 0);
+
+    let none: Option<i32> = None; /* Binding `None` to a variable needs to be type annotated */
+    let _equivalent_none = None::<i32>;
+    let optional_float = Some(0f32);
+
+    // Unwrapping a `Some` variant will extract the value wrapped.
+    println!("{:?} unwraps to {:?}", optional_float, optional_float.unwrap());
+
+    // Unwrapping a `None` variant will `panic!`
+    println!("{:?} unwraps to {:?}", none, none.unwrap());
+}
+
+// An integer division that doesn't `panic!`
+fn checked_division(dividend: i32, divisor: i32) -> Option<i32> {
+    if divisor == 0 { /* Failure is represented as the `None` variant */
+        None
+    } else { /* Result is wrapped in a `Some` variant */
+        Some(dividend / divisor)
+    }
+}
+
+// This function handles a division that may not succeed
+fn try_division(dividend: i32, divisor: i32) {
+    // `Option` values can be pattern matched, just like other enums
+    match checked_division(dividend, divisor) {
+        None => println!("{} / {} failed!", dividend, divisor),
+        Some(quotient) => {
+            println!("{} / {} = {}", dividend, divisor, quotient)
+        },
+    }
+}
+
+
+```
 ---
 ```
 fn main() {
