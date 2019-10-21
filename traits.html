@@ -282,7 +282,7 @@ impl Agility for Elf {
 ```
 ]
 ---
-Would have to do the same for Orc but what if they have the same
+Would have to do the same for Orcs and humans but what if they have the same
 implementation.
 ```
 pub trait Agility{
@@ -290,6 +290,7 @@ pub trait Agility{
   { 0 }
 }
 ```
+traits allow you to add default implementations which can be overloaded.
 ---
 
 needs to still be implemented for every type/struct type
@@ -302,31 +303,21 @@ fn main(){
 }
 
 pub trait Agility{
-  fn agility_bonus(&self) -> u8
-  { 1 }
-  fn agility_multiplier(&self) -> u8
-  { 1 }
+  fn agility_bonus(&self) -> u8 { 1 }
+  fn agility_multiplier(&self) -> u8 { 1 }
 }
-struct Human{
-  name: String
-}
-struct Elf {
-  name: String
-}
-struct Orc{
-  name: String
-}
-impl Agility for Human {
-}
-impl Agility for Orc{
-  fn agility_multiplier(&self) -> u8 { 0.8 }
-}
-impl Agility for Elf {
-  fn agility_bonus(&self) -> u8 { 3 }
+struct Human{ name: String }
+struct Elf { name: String }
+struct Orc{ name: String }
+impl Agility for Human {}
+impl Agility for Orc{ fn agility_multiplier(&self) -> u8 { 0.8 } }
+impl Agility for Elf { fn agility_bonus(&self) -> u8 { 3 }
   fn agility_multiplier(&self) -> u8 {1.2}
 }
 
 ```
+---
+
 ---
 ```
 fn main(){
