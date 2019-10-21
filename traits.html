@@ -302,8 +302,10 @@ fn main(){
 }
 
 pub trait Agility{
-  fn agility_bounds(&self) -> u8
-  { 0 }
+  fn agility_bonus(&self) -> u8
+  { 1 }
+  fn agility_multiplier(&self) -> u8
+  { 1 }
 }
 struct Human{
   name: String
@@ -314,10 +316,14 @@ struct Elf {
 struct Orc{
   name: String
 }
-impl Agility for Human { }
-impl Agility for Orc{ }
+impl Agility for Human {
+}
+impl Agility for Orc{
+  fn agility_multiplier(&self) -> u8 { 0.8 }
+}
 impl Agility for Elf {
   fn agility_bonus(&self) -> u8 { 3 }
+  fn agility_multiplier(&self) -> u8 {1.2}
 }
 
 ```
