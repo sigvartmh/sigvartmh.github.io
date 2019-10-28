@@ -262,11 +262,6 @@ layout: false
 ]
 .right-column[
 ```
-fn main(){
-  let my_elf = Elf {name:String::from("Legolas")};
-  println!("{:?} agility bonus:{}", my_elf, my_elf.agility_bonus());
-}
-
 pub trait Agility{
   fn agility_bonus(&self) -> u8;
 }
@@ -278,6 +273,11 @@ struct Elf {
 
 impl Agility for Elf {
   fn agility_bonus(&self) -> u8 { 3 }
+}
+
+fn main(){
+  let my_elf = Elf {name:String::from("Legolas")};
+  println!("{:?} agility bonus:{}", my_elf, my_elf.agility_bonus());
 }
 ```
 ]
@@ -750,7 +750,7 @@ const slideshow = remark.create({
  }) ;
 </script>
 <script>
-extend_code = (code) => {
+const extend_code = (code) => {
 	if (!code.match(/^fn \w+/m)) {
 		code = "fn main() {\n" + code + "\n}"
 	} else if (!code.match(/^fn main/m)) { // some functions, no main, add an empty one
@@ -758,35 +758,52 @@ extend_code = (code) => {
 	}
 	return code;
 }
-const hljs = remark.highlighter.engine;
-const code_blocks = document.querySelectorAll("pre code");
-code_blocks.forEach((block) => {
-	block.setAttribute("contenteditable", true);
+
+const get_code = (code_blocks) => {
+	code = code_blocks.map((block) => { return block.textContent + "\n" });
+	return code.join("");
+}
+
+const compile_code = (code, output) => {
+	const baseUrl = "https://play.rust-lang.org/evaluate.json";
+	const processed_code = extend_code(code); 
+	const payload = {optimize:"0", version:"stable", code: processed_code};
+	fetch(baseUrl, {
+		method: 'POST',
+		dataType: "json",
+		headers: { 'content-type': 'application/json' },
+		body: JSON.stringify(payload),
+	})
+	.then(res => res.json())
+	.then(data => { output.textContent=data.result;
+			output.style.visibility = '';
+	});
+}
+
+const create_run_button = (output) => {
 	let run_button = document.createElement('button');
+	run_button.innerText = 'run';
+	run_button.onclick = (click) => {
+		const code_block = click.target.nextSibling
+		const output = code_block.nextSibling;
+		const code = get_code(code_block.childNodes);
+		compile_code(code, output);
+	};
+	return run_button
+}
+
+const create_output = () => {
 	let output = document.createElement('code');
 	output.className = "compiled hljs remark-code";
 	output.style.visibility = 'hidden';
 	output.style.margin = '5px 0px 0px 0px'; 
-	run_button.innerText = 'run';
-	run_button.onclick = (click) => {
-		let sibling = click.target.nextSibling 
-		const compiled = sibling.nextSibling;
-		compiled.style.visibility = 'hidden';
-		let code = extend_code(click.target.nextSibling.textContent);
-		let payload = {optimize:"0", version:"stable", code: code};
-		let baseUrl = "https://play.rust-lang.org/evaluate.json";
-		fetch(baseUrl, {
-			method: 'POST',
-			dataType: "json",
-			headers: {
-				'content-type': 'application/json'
-			},
-			body: JSON.stringify(payload),
-		}).then(res => res.json())
-		  .then(data => { compiled.textContent=data.result;
-				  compiled.style.visibility = '';
-		  });
-	};
+	return output
+}
+
+document.querySelectorAll("pre code").forEach((block) => {
+	block.setAttribute("contenteditable", true);
+	const output = create_output();
+	const run_button = create_run_button(output);
 	block.before(run_button);
 	block.after(output);
 });
